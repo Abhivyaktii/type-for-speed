@@ -15,7 +15,7 @@ export default function TypingTest() {
   const [isFinished, setIsFinished] = useState(false);
   const [isPasting, setIsPasting] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [theme, setTheme] = useState<'dark' | 'light'>('dark'); 
+  const [theme, setTheme] = useState<'light' | 'dark'>('light'); // State for theme
 
   const generateNewText = useCallback(() => {
     const randomText = commonPhrases[Math.floor(Math.random() * commonPhrases.length)];
@@ -38,7 +38,7 @@ export default function TypingTest() {
   };
 
   const updateMetrics = useCallback(() => {
-    if (startTime) {
+    if (startTime && !isFinished) { // Only update metrics if the test is not finished
       const wpm = calculateWPM(userInput, startTime);
       const accuracy = calculateAccuracy(userInput, text);
       setMetrics({ wpm, accuracy });
@@ -46,14 +46,14 @@ export default function TypingTest() {
       // Update progress based on the length of typed text
       setProgress((userInput.length / text.length) * 100);
     }
-  }, [startTime, userInput, text]);
+  }, [startTime, userInput, text, isFinished]);
 
   useEffect(() => {
-    if (startTime && userInput.length > 0) {
+    if (startTime && userInput.length > 0 && !isFinished) {
       const intervalId = setInterval(updateMetrics, 500);
       return () => clearInterval(intervalId);
     }
-  }, [userInput, updateMetrics]);
+  }, [userInput, updateMetrics, isFinished]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -124,7 +124,6 @@ export default function TypingTest() {
             </button>
             {/* Theme Toggle Button */}
             <button
-            title='theme'
               onClick={toggleTheme}
               className="flex items-center gap-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-all hover:scale-105 active:scale-95 shadow-md"
             >
